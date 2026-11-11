@@ -1,0 +1,7 @@
+remember my_number as 0
+
+do this 5 times:
+    add one to my_number
+ok
+
+what is my_number?

@@ -1,0 +1,8 @@
+remember countdown as 5
+
+do this 5 times:
+    what is countdown?
+    take 1 from countdown
+ok
+
+say "Blast off!"

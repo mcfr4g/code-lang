@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Code v0.2 is Turnip Complete! Run scripts with the native Rust interpreter and explore the language reference.">
+  <meta name="theme-color" content="#0c111b">
+  <link rel="icon" href="code-logo.svg" type="image/svg+xml">
+  <title>Code- often stylised as "Code" · Documentation</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #0c111b;
+      --panel: #121a27;
+      --panel-raised: #192434;
+      --rule: #2b374b;
+      --ink: #e6edf8;
+      --muted: #aebbd1;
+      --dim: #8c9bb4;
+      --accent: #8ff3c0;
+      --accent-bright: #b3ffd7;
+      --violet: #cbbcff;
+      --peach: #ffbc92;
+      --editor: #0d1522;
+      --terminal: #090f19;
+      --mono: "IBM Plex Mono", Menlo, "DejaVu Sans Mono", Consolas, monospace;
+      --display: "Space Mono", var(--mono);
+      font-family: var(--mono);
+      line-height: 1.65;
+      background: var(--page);
+      color: var(--ink);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-size: 0.94rem; }
+    a { color: var(--accent); text-underline-offset: 0.2em; }
+    a:hover { color: var(--accent-bright); }
+    a:focus-visible, button:focus-visible, pre:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+    pre:focus-visible { outline-offset: -3px; }
+    ::selection { color: var(--ink); background: #424b77; }
+    h1, h2, h3, p, ul, ol, figure { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.18; }
+    h2, h3, section { scroll-margin-top: 1.6rem; }
+    p { margin-bottom: 1rem; }
+    code, pre { font-family: var(--mono); }
+    :not(pre) > code {
+      padding: 0.1em 0.32em;
+      border: 1px solid var(--rule);
+      border-radius: 0.25rem;
+      color: var(--violet);
+      background: var(--panel);
+      font-size: 0.87em;
+      overflow-wrap: anywhere;
+    }
+
+    .shell { width: min(100% - 3rem, 74rem); margin-inline: auto; }
+    .skip-link {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 2;
+      padding: 0.5rem 0.85rem;
+      background: var(--panel);
+      transform: translateY(-150%);
+    }
+    .skip-link:focus { transform: none; }
+    .site-header {
+      border-bottom: 1px solid var(--rule);
+      background: linear-gradient(90deg, var(--violet), var(--accent), var(--peach)) top / 100% 2px no-repeat, var(--terminal);
+    }
+    .site-header .shell {
+      min-height: 4.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.72rem;
+      color: var(--ink);
+      font: 700 1.03rem var(--display);
+      text-decoration: none;
+    }
+    .brand-mark { width: 2.2rem; height: 2.2rem; }
+    .version {
+      padding-left: 0.7rem;
+      border-left: 1px solid var(--rule);
+      color: var(--dim);
+      font: 0.78rem var(--mono);
+    }
+    .top-nav { display: flex; gap: 1.5rem; font: 0.83rem var(--mono); }
+    .top-nav a { color: var(--muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent); text-decoration: underline; }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+      align-items: center;
+      gap: clamp(2rem, 6vw, 5.5rem);
+      padding-block: clamp(3.1rem, 6.8vw, 5.8rem);
+      border-bottom: 1px solid var(--rule);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 77% 59%, #26876c5c, transparent 47%),
+        radial-gradient(ellipse at 30% 35%, #7557c35e, transparent 55%),
+        linear-gradient(#8997ce26 1px, transparent 1px) 0 0 / 25px 25px,
+        linear-gradient(90deg, #8997ce26 1px, transparent 1px) 0 0 / 25px 25px;
+      mask-image: radial-gradient(ellipse at 56% 53%, #000 18%, transparent 78%);
+      pointer-events: none;
+    }
+    .hero h1 { margin-bottom: 1.25rem; font-family: var(--display); }
+    .hero-name {
+      display: block;
+      font-size: clamp(4.1rem, 8.3vw, 7.25rem);
+      font-weight: 700;
+      letter-spacing: -0.085em;
+      line-height: 0.99;
+    }
+    .hero-dash { color: var(--accent); text-shadow: 0 0 2.1rem #8ff3c053; }
+    .hero-formal {
+      display: block;
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: clamp(1.12rem, 2.35vw, 1.65rem);
+      font-weight: 500;
+      letter-spacing: -0.065em;
+      text-wrap: balance;
+    }
+    .hero-quote { color: var(--violet); }
+    .turnip-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+      padding: 0.28rem 0.7rem 0.28rem 0.4rem;
+      border: 1px solid #665b91;
+      border-radius: 0.35rem;
+      color: var(--violet);
+      background: #24213b;
+      font: 700 0.91rem var(--display);
+      text-decoration: none;
+    }
+    .turnip-status:hover { background: #31294d; color: #e7dfff; }
+    .turnip-status img { display: block; width: 2rem; height: 2rem; }
+    .hero p { max-width: 31rem; margin-bottom: 1.55rem; font-size: 0.98rem; color: var(--muted); }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 0.8rem 1rem; }
+    .primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0.9rem;
+      background: var(--accent);
+      color: #0a2419;
+      border: 1px solid transparent;
+      border-radius: 0.38rem;
+      font: 650 0.85rem var(--mono);
+      text-decoration: none;
+    }
+    .primary:hover { color: #0a2419; background: var(--accent-bright); }
+    .secondary {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #62558a;
+      border-radius: 0.38rem;
+      color: var(--violet);
+      background: var(--panel);
+      font: 650 0.85rem var(--mono);
+      text-decoration: none;
+    }
+    .secondary:hover { color: var(--ink); background: var(--panel-raised); }
+    .hero .example {
+      margin: 0;
+      border-color: transparent;
+      background: linear-gradient(var(--editor), var(--editor)) padding-box,
+        linear-gradient(135deg, var(--violet), #455375 46%, var(--accent)) border-box;
+      box-shadow: 0 20px 52px #05080f99, 0 0 54px #8b6ee333;
+    }
+    .terminal-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      padding: 0.5rem 0.65rem 0.25rem 0.95rem;
+    }
+    .terminal-toolbar .output-label { padding: 0; }
+    .runtime-switch {
+      display: flex;
+      gap: 0.15rem;
+      min-width: 0;
+      margin: 0;
+      padding: 0.15rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.35rem;
+      background: var(--editor);
+    }
+    .runtime-switch[hidden] { display: none; }
+    .runtime-switch label {
+      padding: 0.29rem 0.47rem;
+      border-radius: 0.23rem;
+      color: var(--muted);
+      font: 0.72rem var(--mono);
+      cursor: pointer;
+    }
+    .runtime-switch input:checked + label { color: var(--accent); background: var(--panel-raised); }
+    .runtime-switch input:focus-visible + label { outline: 2px solid var(--accent); }
+    .runtime-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+      margin: 1.25rem 0;
+    }
+    .runtime-card {
+      --runtime-accent: var(--violet);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 0.95rem;
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--runtime-accent);
+      border-radius: 0.55rem;
+      background: var(--panel);
+    }
+    .runtime-card.native { --runtime-accent: var(--peach); }
+    .guide .runtime-card h3 { margin-top: 0; color: var(--runtime-accent); }
+    .runtime-card p { color: var(--muted); font-size: 0.86rem; }
+    .runtime-card .command { margin: auto 0 0; }
+    .runtime-card pre { font-size: 0.79rem; }
+    .guide .arrow-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin: 1rem 0;
+      padding: 0;
+      list-style: none;
+    }
+    .guide .arrow-grid li {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+      margin-top: 0;
+      padding: 0.85rem 0.35rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.45rem;
+      background: radial-gradient(ellipse at 50% 25%, #5441845c, transparent 75%), var(--panel);
+    }
+    .arrow-glyph { font: 1.7rem/1.2 system-ui, sans-serif; }
+    .arrow-grid code { white-space: nowrap; }
+    @media (max-width: 800px) {
+      .runtime-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 14rem minmax(0, 1fr);
+      gap: clamp(2rem, 6vw, 4.8rem);
+      align-items: start;
+      padding-block: 3rem 5rem;
+    }
+    .contents {
+      position: sticky;
+      top: 1.75rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.55rem;
+      overflow: hidden;
+      background: var(--editor);
+    }
+    .contents h2 {
+      margin: 0;
+      padding: 0.78rem 0.85rem;
+      border-bottom: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--muted);
+      font: 600 0.77rem var(--mono);
+    }
+    .contents ul { margin: 0; padding: 0.4rem 0; list-style: none; }
+    .contents a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.45rem;
+      padding: 0.42rem 0.8rem;
+      border-left: 2px solid transparent;
+      color: var(--muted);
+      font: 0.77rem/1.45 var(--mono);
+      text-decoration: none;
+    }
+    .contents a::before { content: "›" / ""; color: var(--dim); }
+    .contents a:hover, .contents a[aria-current] {
+      border-left-color: var(--accent);
+      background: var(--panel-raised);
+      color: var(--accent);
+    }
+    .contents a:focus-visible { outline-offset: -3px; }
+    .guide { width: min(100%, 49.5rem); min-width: 0; }
+    .guide > section + section {
+      margin-top: 2.75rem;
+      padding-top: 2.55rem;
+      border-top: 1px solid var(--rule);
+    }
+    .guide h2 {
+      margin-bottom: 0.95rem;
+      font: 700 clamp(1.52rem, 3vw, 2.02rem)/1.24 var(--display);
+      letter-spacing: -0.06em;
+    }
+    .guide h3 {
+      margin: 1.55rem 0 0.55rem;
+      color: var(--violet);
+      font: 700 1.12rem/1.4 var(--display);
+    }
+    .turnip-note {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(6rem, 15vw, 9rem);
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.4rem;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.55rem;
+      background: radial-gradient(ellipse at 88% 50%, #493b6c46, transparent 52%), var(--panel);
+    }
+    .turnip-note h3 { margin-top: 0; }
+    .turnip-note p { margin-bottom: 0; }
+    .turnip-illustration { display: block; width: 100%; height: auto; }
+    .guide ol, .guide ul { padding-left: 1.4rem; }
+    .guide li + li { margin-top: 0.38rem; }
+    .guide li::marker { color: var(--accent); font-family: var(--mono); }
+    .note {
+      padding: 0.8rem 1rem;
+      border: 1px solid #304c49;
+      border-left: 3px solid var(--accent);
+      border-radius: 0.38rem;
+      background: #152521;
+    }
+    .note code { background: #1b302a; }
+
+    .example, .command {
+      margin: 1rem 0 1.3rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.55rem;
+      overflow: hidden;
+      min-width: 0;
+      background: var(--editor);
+    }
+    .code-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 0.65rem;
+      min-height: 2.85rem;
+      padding-right: 0.55rem;
+      border-bottom: 1px solid var(--rule);
+      background: var(--panel);
+      color: var(--muted);
+      font: 0.78rem var(--mono);
+    }
+    .code-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+      padding: 0.6rem 0.8rem;
+      border-top: 2px solid var(--accent);
+      border-right: 1px solid var(--rule);
+      background: var(--editor);
+      color: var(--ink);
+    }
+    a.code-tab { text-decoration: none; }
+    a.code-tab:hover { color: var(--accent); }
+    .tab-icon, .prompt { color: var(--accent); user-select: none; }
+    .copy {
+      align-self: center;
+      color: var(--muted);
+      background: var(--editor);
+      border: 1px solid #43536a;
+      border-radius: 0.28rem;
+      padding: 0.28rem 0.56rem;
+      font: 0.72rem var(--mono);
+      cursor: pointer;
+    }
+    .copy:hover { color: var(--ink); background: var(--panel-raised); border-color: var(--dim); }
+    .code-actions { display: flex; align-items: center; gap: 0.35rem; }
+    .playground-panel {
+      overflow: hidden;
+      margin: 1.2rem 0;
+      border: 1px solid #526b6f;
+      border-radius: 0.6rem;
+      background: var(--editor);
+      box-shadow: 0 0 38px #8ff3c015;
+    }
+    .playground-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.72rem;
+      border-bottom: 1px solid var(--rule);
+      background: var(--panel-raised);
+      color: var(--muted);
+      font: 0.78rem var(--mono);
+    }
+    .playground-toolbar select, .playground-toolbar button {
+      min-height: 2rem;
+      padding: 0.25rem 0.55rem;
+      border: 1px solid #52637a;
+      border-radius: 0.3rem;
+      background: var(--editor);
+      color: var(--ink);
+      font: inherit;
+    }
+    .playground-toolbar select { max-width: 100%; }
+    .playground-toolbar button { cursor: pointer; }
+    .playground-toolbar button:hover { background: var(--panel); }
+    .playground-toolbar button:disabled { opacity: 0.58; cursor: default; }
+    .playground-toolbar .run-code { background: var(--accent); color: #0a2419; font-weight: 700; }
+    .playground-toolbar .run-code:hover:not(:disabled) { background: var(--accent-bright); }
+    .playground-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr); }
+    .playground-editor, .playground-terminal { min-width: 0; }
+    .playground-terminal { border-left: 1px solid var(--rule); background: var(--terminal); }
+    .playground-pane-label {
+      display: block;
+      padding: 0.55rem 0.78rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--dim);
+      font: 0.75rem var(--mono);
+    }
+    .playground-editor textarea {
+      display: block;
+      width: 100%;
+      min-height: 15rem;
+      padding: 0.75rem;
+      border: 0;
+      resize: vertical;
+      background: var(--editor);
+      color: var(--ink);
+      font: 0.84rem/1.7 var(--mono);
+      tab-size: 4;
+      white-space: pre;
+      overflow: auto;
+    }
+    .playground-editor textarea:focus-visible, .playground-toolbar select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    .playground-terminal pre { min-height: 8rem; max-height: 22rem; color: var(--accent); white-space: pre-wrap; }
+    .playground-input {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 0.78rem;
+      border-top: 1px solid var(--rule);
+      color: var(--violet);
+      font: 0.78rem var(--mono);
+    }
+    .playground-input[hidden] { display: none; }
+    .playground-input input, .playground-input button {
+      min-height: 2rem;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid #52637a;
+      border-radius: 0.3rem;
+      font: inherit;
+    }
+    .playground-input input { flex: 1 1 8rem; min-width: 0; color: var(--ink); background: var(--editor); }
+    .playground-input input:focus-visible { outline: 2px solid var(--accent); }
+    .playground-input button { color: #0a2419; background: var(--accent); cursor: pointer; }
+    .playground-panel .playground-status {
+      margin: 0;
+      padding: 0.55rem 0.78rem;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font: 0.75rem/1.4 var(--mono);
+    }
+    .playground-status[data-state="complete"] { color: var(--accent); }
+    .playground-status[data-state="waiting"] { color: var(--violet); }
+    .playground-status[data-state="error"] { color: var(--peach); }
+    pre {
+      margin: 0;
+      padding: 0.9rem 1rem 1rem;
+      overflow: auto;
+      font-size: 0.85rem;
+      line-height: 1.75;
+      tab-size: 4;
+    }
+    .editor-source {
+      padding-left: 0;
+      background: linear-gradient(90deg, var(--panel) 0 3.05rem, transparent 3.05rem);
+    }
+    .editor-source > code { counter-reset: source-line; }
+    .source-line { counter-increment: source-line; }
+    .line-number {
+      display: inline-block;
+      width: 3.05rem;
+      margin-right: 0.95rem;
+      padding-right: 0.72rem;
+      border-right: 1px solid var(--rule);
+      color: var(--dim);
+      text-align: right;
+      user-select: none;
+    }
+    .line-number::before { content: counter(source-line, decimal-leading-zero); }
+    .example-output {
+      border-top: 1px solid var(--rule);
+      background: var(--terminal);
+    }
+    .output-label {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.6rem 0.95rem 0.5rem;
+      color: var(--dim);
+      font: 0.75rem var(--mono);
+    }
+    .example-output pre { padding-top: 0; }
+    .terminal-run {
+      padding: 0 0.95rem 0.16rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    [data-output] { color: var(--accent); }
+    .syntax-word { color: var(--violet); font-weight: 600; }
+    .syntax-text { color: #a8e6be; }
+    .syntax-number { color: #ffbd96; }
+    .syntax-comment { color: var(--dim); font-style: italic; }
+
+    .table-scroll {
+      overflow-x: auto;
+      margin: 1rem 0 1.3rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.45rem;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 0.63rem 0.82rem; vertical-align: top; border-bottom: 1px solid var(--rule); }
+    thead th { background: var(--panel-raised); color: var(--ink); font: 600 0.78rem var(--mono); }
+    tbody tr { background: var(--editor); }
+    tbody tr:nth-child(even) { background: var(--panel); }
+    tbody tr:last-child td { border-bottom: 0; }
+    .reference td:first-child { width: 52%; }
+    .examples-table td:first-child { width: 41%; }
+    .examples-table a { font: 0.84rem var(--mono); overflow-wrap: anywhere; }
+    .faq-list { margin: 1rem 0 0; }
+    .faq-list dt, .faq-list dd {
+      margin: 0;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--rule);
+    }
+    .faq-list dt {
+      border-radius: 0.45rem 0.45rem 0 0;
+      background: var(--panel-raised);
+      color: var(--violet);
+      font-weight: 700;
+    }
+    .faq-list dt:not(:first-child) { margin-top: 0.75rem; }
+    .faq-list dd {
+      border-top: 0;
+      border-radius: 0 0 0.45rem 0.45rem;
+      background: var(--editor);
+    }
+    .site-footer {
+      border-top: 1px solid var(--rule);
+      background: var(--terminal);
+      color: var(--dim);
+      font: 0.8rem var(--mono);
+    }
+    .site-footer .shell { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding-block: 1.25rem; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 850px) {
+      .hero { gap: 2rem; }
+      .docs-layout { grid-template-columns: 11.25rem minmax(0, 1fr); gap: 1.65rem; }
+      .guide .arrow-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 690px) {
+      .shell { width: calc(100% - 2rem); }
+      .top-nav { gap: 0.8rem; }
+      .hero, .docs-layout { grid-template-columns: minmax(0, 1fr); }
+      .hero { padding-block: 2.65rem; }
+      .hero-name { font-size: clamp(4rem, 13vw, 6rem); }
+      .hero-formal { text-wrap: wrap; }
+      .docs-layout { padding-top: 1.55rem; }
+      .contents { position: static; }
+      .contents ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      th, td { padding-inline: 0.55rem; }
+      .editor-source { background: linear-gradient(90deg, var(--panel) 0 2.45rem, transparent 2.45rem); }
+      .line-number { width: 2.45rem; padding-right: 0.55rem; margin-right: 0.7rem; }
+      .playground-split { grid-template-columns: minmax(0, 1fr); }
+      .playground-terminal { border-top: 1px solid var(--rule); border-left: 0; }
+    }
+    @media (max-width: 470px) {
+      .turnip-note { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+      .turnip-illustration { width: 7rem; justify-self: center; }
+    }
+    @media (max-width: 380px) {
+      .top-nav a:last-child { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      :root {
+        color-scheme: light;
+        --page: #fff;
+        --panel: #f5f5f5;
+        --panel-raised: #ececec;
+        --rule: #aaa;
+        --ink: #111;
+        --muted: #333;
+        --dim: #444;
+        --accent: #104b38;
+        --violet: #342361;
+        --peach: #794320;
+        --editor: #fff;
+        --terminal: #fff;
+      }
+      .top-nav, .hero-actions, .hero::before, .contents, .copy, .runtime-switch, .site-footer, #playground { display: none; }
+      .shell { width: 100%; }
+      .hero, .docs-layout { display: block; padding-block: 1rem; }
+      .hero-name { font-size: 2.4rem; }
+      .guide { width: 100%; }
+      .site-header, .hero .example, .guide .arrow-grid li { background: var(--panel); }
+      .hero .example { box-shadow: none; border-color: var(--rule); }
+      .example, .command, .runtime-card { break-inside: avoid; }
+      .note, .note code { background: var(--panel); }
+      .turnip-status { border-color: var(--rule); background: var(--panel); }
+      .turnip-note { break-inside: avoid; background: var(--panel); }
+      .syntax-text, .syntax-number { color: var(--ink); }
+      .editor-source { background: var(--editor); }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body id="top">
+  <a class="skip-link" href="#guide">Skip to the guide</a>
+  <header class="site-header">
+    <div class="shell">
+      <a class="brand" href="#top" aria-label="Code v0.2, top of page">
+        <img class="brand-mark" src="code-logo.svg" width="35" height="35" alt="">
+        <span>Code</span>
+        <span class="version">v0.2</span>
+      </a>
+      <nav class="top-nav" aria-label="Shortcuts">
+        <a href="#native-build">Build</a>
+        <a href="#examples">Examples</a>
+        <a href="#tests">Tests</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="hero">
+      <div>
+        <h1><span class="hero-name">Code<span class="hero-dash">-</span></span> <span class="hero-formal">often stylised as <span class="hero-quote">"Code"</span></span></h1>
+        <a class="turnip-status" href="#turnip-complete"><img src="turnip.png" width="32" height="32" alt="">Turnip Complete!</a>
+        <p>An English-like language for learning, experimenting, and writing small scripts.</p>
+        <div class="hero-actions">
+          <a class="primary" href="#playground">Try Code in the browser <span aria-hidden="true">↓</span></a>
+          <a class="secondary" href="#quick-start">Run in Terminal</a>
+        </div>
+      </div>
+      <figure class="example" data-program="apples">
+        <figcaption class="code-heading">
+          <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/apples.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>apples.code</a>
+          <button type="button" class="copy" data-copy="source-apples" aria-label="Copy apples.code" hidden>Copy</button>
+        </figcaption>
+        <pre class="editor-source" tabindex="0"><code id="source-apples" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">remember</span> <span class="syntax-number">10</span> <span class="syntax-word">as</span> apples</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>apples <span class="syntax-word">but</span> <span class="syntax-number">5</span> <span class="syntax-word">more</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">how</span> <span class="syntax-word">many</span> apples?</span></code></pre>
+        <div class="example-output">
+          <div class="terminal-toolbar">
+            <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+            <fieldset class="runtime-switch" id="hero-runtime" hidden>
+              <legend class="sr-only">Choose the interpreter for the example command</legend>
+              <input class="sr-only" id="hero-rust" type="radio" name="runtime" value="./bin/code-lang" checked>
+              <label for="hero-rust">Rust</label>
+              <input class="sr-only" id="hero-python" type="radio" name="runtime" value="./code-lang">
+              <label for="hero-python">Python</label>
+            </fieldset>
+          </div>
+          <pre class="terminal-run"><span class="prompt" aria-hidden="true">$</span> <code id="hero-command">./bin/code-lang examples/apples.code</code></pre>
+          <pre tabindex="0"><code data-output>15</code></pre>
+        </div>
+      </figure>
+    </div>
+
+    <div class="docs-layout">
+      <nav class="contents" aria-labelledby="contents-heading">
+        <h2 id="contents-heading">On this page</h2>
+        <ul>
+          <li><a href="#playground">Browser playground</a></li>
+          <li><a href="#quick-start">Quick start</a></li>
+          <li><a href="#native-build">Build from source</a></li>
+          <li><a href="#variables">Values and variables</a></li>
+          <li><a href="#comments">Comments</a></li>
+          <li><a href="#input">Interactive input</a></li>
+          <li><a href="#control-flow">Conditions and loops</a></li>
+          <li><a href="#collections">Collections</a></li>
+          <li><a href="#nested-collections">Nested collections</a></li>
+          <li><a href="#advanced-features">Advanced features</a></li>
+          <li><a href="#snake">The snake rule</a></li>
+          <li><a href="#examples">Examples</a></li>
+          <li><a href="#tests">Tests and limits</a></li>
+          <li><a href="#faqs">FAQs</a></li>
+        </ul>
+      </nav>
+
+      <article class="guide" id="guide" aria-label="Code documentation">
+        <section id="playground" aria-labelledby="playground-heading">
+          <h2 id="playground-heading">Browser playground</h2>
+          <p>Pick a bundled example, edit it, and click <strong>Run</strong>. Use <strong>Stop</strong> to interrupt a loop. <span id="playground-editor-help"><kbd>Tab</kbd> indents. Press <kbd>Esc</kbd>, then <kbd>Tab</kbd> to move focus out of the editor.</span></p>
+          <div class="playground-panel" id="playground-controls" hidden>
+            <div class="playground-toolbar">
+              <label for="playground-example">Example</label>
+              <select id="playground-example"></select>
+              <button type="button" id="playground-run" class="run-code">Run</button>
+              <button type="button" id="playground-stop" disabled>Stop</button>
+              <button type="button" id="playground-reset">Reset</button>
+            </div>
+            <div class="playground-split">
+              <div class="playground-editor">
+                <label for="playground-source" class="playground-pane-label">Code</label>
+                <textarea id="playground-source" aria-describedby="playground-editor-help" rows="10" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+              </div>
+              <div class="playground-terminal">
+                <span id="playground-output-label" class="playground-pane-label">Output</span>
+                <pre id="playground-output" aria-labelledby="playground-output-label" tabindex="0"></pre>
+                <form class="playground-input" id="playground-input" hidden>
+                  <label for="playground-answer">Answer</label>
+                  <input id="playground-answer" type="text" maxlength="65536" autocomplete="off" spellcheck="false">
+                  <button type="submit">Submit</button>
+                </form>
+              </div>
+            </div>
+            <p id="playground-status" class="playground-status" role="status">Ready.</p>
+          </div>
+          <p id="playground-unavailable" class="note" hidden>The browser playground requires WebAssembly and web workers. You can run the same examples from Terminal.</p>
+          <noscript><p class="note">Enable JavaScript to use the browser playground.</p></noscript>
+        </section>
+
+        <section id="quick-start" aria-labelledby="quick-start-heading">
+          <h2 id="quick-start-heading">Quick start</h2>
+          <p>Open Terminal in the <strong>Code</strong> project folder. Running <code>ls</code> there should show <code>bin</code>, <code>examples</code>, and <code>native</code>. Run the apples example with either interpreter. Both print <code>15</code>.</p>
+          <div class="runtime-grid">
+            <div class="runtime-card native">
+              <h3>Native Rust</h3>
+              <p>The included executable runs on Apple silicon Macs without Python or Cargo.</p>
+              <div class="command">
+                <div class="code-heading"><span class="code-tab"><span class="tab-icon" aria-hidden="true">&gt;_</span>macOS arm64</span><button type="button" class="copy" data-copy="run-native" aria-label="Copy the native command to run apples" hidden>Copy</button></div>
+                <pre tabindex="0"><code id="run-native">./bin/code-lang examples/apples.code</code></pre>
+              </div>
+            </div>
+            <div class="runtime-card">
+              <h3>Python reference</h3>
+              <p>The launcher uses Python 3.10 or newer. You can also invoke the module with <code>python3 -m code_lang</code>.</p>
+              <div class="command">
+                <div class="code-heading"><span class="code-tab"><span class="tab-icon" aria-hidden="true">&gt;_</span>macOS / Linux</span><button type="button" class="copy" data-copy="run-python" aria-label="Copy the Python command to run apples" hidden>Copy</button></div>
+                <pre tabindex="0"><code id="run-python">./code-lang examples/apples.code</code></pre>
+              </div>
+            </div>
+          </div>
+          <p>To write a program, save a UTF-8 text file such as <code>hello.code</code> in the project folder, then run <code>./bin/code-lang hello.code</code>. Try <code>say "Hello!"</code> as your first line.</p>
+          <p class="note">If Terminal can’t find the command, run <code>pwd</code> to check your folder. To run the native interpreter on another platform, build it from source below.</p>
+          <p>Program errors show the filename and physical line number, including blank and comment lines. A failed program exits with status 1.</p>
+        </section>
+
+        <section id="native-build" aria-labelledby="native-build-heading">
+          <h2 id="native-build-heading">Build from source</h2>
+          <p>With Rust and Cargo installed, run these commands from the project folder. Cargo uses the dependency versions in <code>native/Cargo.lock</code>.</p>
+          <div class="command">
+            <div class="code-heading"><span class="code-tab"><span class="tab-icon" aria-hidden="true">&gt;_</span>Cargo</span><button type="button" class="copy" data-copy="build-native" aria-label="Copy the native build command" hidden>Copy</button></div>
+            <pre tabindex="0"><code id="build-native">cargo build --release --locked --manifest-path native/Cargo.toml</code></pre>
+          </div>
+          <div class="command">
+            <div class="code-heading"><span class="code-tab"><span class="tab-icon" aria-hidden="true">&gt;_</span>Run the build</span><button type="button" class="copy" data-copy="run-built" aria-label="Copy the command to run the built executable" hidden>Copy</button></div>
+            <pre tabindex="0"><code id="run-built">./native/target/release/code-lang examples/apples.code</code></pre>
+          </div>
+          <p>On Windows, run <code>.\native\target\release\code-lang.exe examples\apples.code</code> after building. The included executable was built and tested on Apple silicon macOS.</p>
+        </section>
+
+        <section id="variables" aria-labelledby="variables-heading">
+          <h2 id="variables-heading">Values and variables</h2>
+          <p>Values can be integers, decimals, double-quoted text, <code>true</code>, <code>false</code>, or collections. A single character is text. Strings accept JSON-style escapes such as <code>\n</code> and <code>\"</code>.</p>
+          <p>Declare a variable once with <code>remember</code> before you use it. Use <code>set</code> to change it later. Names are case-sensitive and can contain ASCII letters, digits, and underscores. The first character must be a letter or underscore.</p>
+          <div class="table-scroll">
+            <table class="reference" aria-label="Variable, arithmetic, and output commands">
+              <thead><tr><th scope="col">Syntax</th><th scope="col">What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>remember score as 0</code><br><code>remember 0 as score</code></td><td>Declare a new variable in either order.</td></tr>
+                <tr><td><code>set score to 10</code></td><td>Replace a declared variable's value.</td></tr>
+                <tr><td><code>add 5 to score</code><br><code>score but 5 more</code></td><td>Add to the stored number. <code>add one to score</code> also works.</td></tr>
+                <tr><td><code>take 2 from score</code><br><code>score but x less</code></td><td>Subtract a number or the value of a numeric variable.</td></tr>
+                <tr><td><code>say score</code><br><code>what is score?</code></td><td>Print a value. Both forms accept collection lookups.</td></tr>
+                <tr><td><code>say on one line score</code></td><td>Print a value without adding a line break. Line breaks already in the value are preserved.</td></tr>
+                <tr><td><code>how many score?</code></td><td>Print a numeric variable.</td></tr>
+                <tr><td><code>note: this is a comment</code></td><td>Skip a whole comment line.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>For value-first declaration from another variable, write <code>remember (source) as target</code>. With a bare identifier before <code>as</code>, Code treats it as the new variable's name.</p>
+        </section>
+
+        <section id="comments" aria-labelledby="comments-heading">
+          <h2 id="comments-heading">Comments</h2>
+          <p>Use <code>comment on one line:</code> to skip a whole line. Put <code>comment:</code> and <code>end of comment</code> on their own lines to enclose a block of text. The first standalone <code>end of comment</code> closes the block. <code>note:</code> also works for single-line comments.</p>
+          <figure class="example" data-program="comments">
+            <figcaption class="code-heading">
+              <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/comments.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>comments.code</a>
+              <button type="button" class="copy" data-copy="source-comments" aria-label="Copy comments.code" hidden>Copy</button>
+            </figcaption>
+            <pre class="editor-source" tabindex="0"><code id="source-comments" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-comment">comment:</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-comment">    This is a multiline comment.</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-comment">    say "This line is ignored."</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-comment">end of comment</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-comment">comment on one line: Only the next line produces output.</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-text">&quot;Hello from Code!&quot;</span></span></code></pre>
+            <div class="example-output">
+              <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+              <pre tabindex="0"><code data-output>Hello from Code!</code></pre>
+            </div>
+          </figure>
+        </section>
+
+        <section id="input" aria-labelledby="input-heading">
+          <h2 id="input-heading">Interactive input</h2>
+          <p><code>ask "Your name?" and remember as name</code> prints the prompt on its own line, reads one response, and declares <code>name</code> as text.</p>
+          <p>Type your response in Terminal or use the <strong>Answer</strong> field that appears in the browser playground. A blank answer is valid. Try <a href="https://github.com/mcfr4g/code-lang/blob/main/examples/ask.code">ask.code</a>.</p>
+        </section>
+
+        <section id="control-flow" aria-labelledby="control-flow-heading">
+          <h2 id="control-flow-heading">Conditions and loops</h2>
+          <ul>
+            <li><code>if ready:</code> runs a block when the condition is true. Add <code>otherwise:</code> for the false branch. One <code>ok</code> closes both branches.</li>
+            <li><code>while ready:</code> checks the condition before each iteration. It can run indefinitely if the condition stays true.</li>
+            <li><code>do this 5 times:</code> runs a block a fixed number of times. Code reads the count once, before the loop starts. It must be a non-negative integer.</li>
+          </ul>
+          <p>Use a truth value or compare two values with <code>is equal to</code>, <code>is not equal to</code>, <code>is greater than</code>, or <code>is less than</code>. Ordering requires numbers. Equality accepts numbers, text, and truth values. <code>2</code> equals <code>2.0</code>, and <code>true</code> is distinct from <code>1</code>.</p>
+          <p><code>if answer is "Y":</code> is short for <code>if answer is equal to "Y":</code>. Text comparisons are case-sensitive.</p>
+          <p>Close each loop with <code>ok</code>. Blocks can be nested. Indentation is for readability.</p>
+          <figure class="example" data-program="turnips">
+        <figcaption class="code-heading">
+          <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/turnips.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>turnips.code</a>
+          <button type="button" class="copy" data-copy="source-turnips" aria-label="Copy turnips.code" hidden>Copy</button>
+        </figcaption>
+        <pre class="editor-source" tabindex="0"><code id="source-turnips" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">remember</span> <span class="syntax-number">3</span> <span class="syntax-word">as</span> turnips</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">while</span> turnips <span class="syntax-word">is</span> <span class="syntax-word">greater</span> <span class="syntax-word">than</span> <span class="syntax-number">0</span>:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">if</span> turnips <span class="syntax-word">is</span> <span class="syntax-word">equal</span> <span class="syntax-word">to</span> <span class="syntax-number">1</span>:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>        <span class="syntax-word">say</span> <span class="syntax-text">&quot;Last turnip!&quot;</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">otherwise</span>:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>        <span class="syntax-word">how</span> <span class="syntax-word">many</span> turnips?</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">ok</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    turnips <span class="syntax-word">but</span> <span class="syntax-number">1</span> <span class="syntax-word">less</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">ok</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-text">&quot;Turnip complete.&quot;</span></span></code></pre>
+        <div class="example-output">
+          <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+          <pre tabindex="0"><code data-output>3
+2
+Last turnip!
+Turnip complete.</code></pre>
+        </div>
+      </figure>
+          <div class="turnip-note">
+            <div>
+              <h3 id="turnip-complete">Turnip Complete!</h3>
+              <p>In Code, Turnip Complete means Turing-complete. With unbounded memory, <code>while</code> loops, zero tests, and integer updates can simulate a universal two-counter machine.</p>
+            </div>
+            <img class="turnip-illustration" src="turnip.png" width="1254" height="1254"
+                 alt="Pixel-art turnip with green leaves and a purple-and-cream root" loading="lazy">
+          </div>
+        </section>
+
+        <section id="collections" aria-labelledby="collections-heading">
+          <h2 id="collections-heading">Collections</h2>
+          <p>A collection stores values in order. Positions start at 1. An item can also have a name that is unique within its collection. Item names are identifiers such as <code>quantity</code>.</p>
+          <p>Write a single-line collection as <code>all of these: 1, 2, 3</code>. For a multiline collection, put each item on its own line, optionally followed by a comma, and close with <code>ok</code>. A multiline collection with no items is empty.</p>
+          <div class="table-scroll">
+            <table class="reference" aria-label="Collection operations">
+              <thead><tr><th scope="col">Syntax</th><th scope="col">What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>the first of inventory</code><br><code>position 11 of inventory</code></td><td>Read by position. Use <code>first</code> through <code>tenth</code> or a literal integer after <code>position</code>.</td></tr>
+                <tr><td><code>inventory named quantity</code></td><td>Read a named item. Missing names and positions raise errors.</td></tr>
+                <tr><td><code>how many are in inventory?</code></td><td>Print the number of items.</td></tr>
+                <tr><td><code>put "orange" into inventory</code></td><td>Append an unnamed item.</td></tr>
+                <tr><td><code>put 20 into inventory named quantity</code></td><td>Replace an existing named item at its current position.</td></tr>
+                <tr><td><code>remove the third of inventory</code></td><td>Remove the item and its name. Later positions shift down.</td></tr>
+                <tr><td><code>for each item in inventory:</code></td><td>Visit every value in order. Close the loop with <code>ok</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figure class="example" data-program="inventory">
+        <figcaption class="code-heading">
+          <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/inventory.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>inventory.code</a>
+          <button type="button" class="copy" data-copy="source-inventory" aria-label="Copy inventory.code" hidden>Copy</button>
+        </figcaption>
+        <pre class="editor-source" tabindex="0"><code id="source-inventory" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">remember</span> inventory <span class="syntax-word">as</span> <span class="syntax-word">all</span> <span class="syntax-word">of</span> <span class="syntax-word">these</span>:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-text">&quot;apple&quot;</span> <span class="syntax-word">named</span> fruit,</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-number">12</span> <span class="syntax-word">named</span> quantity,</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-text">&quot;banana&quot;</span>,</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-number">5</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">ok</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">what</span> <span class="syntax-word">is</span> <span class="syntax-word">the</span> first <span class="syntax-word">of</span> inventory?</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">what</span> <span class="syntax-word">is</span> <span class="syntax-word">the</span> third <span class="syntax-word">of</span> inventory?</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">what</span> <span class="syntax-word">is</span> inventory <span class="syntax-word">named</span> quantity?</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">how</span> <span class="syntax-word">many</span> <span class="syntax-word">are</span> <span class="syntax-word">in</span> inventory?</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">put</span> <span class="syntax-text">&quot;orange&quot;</span> <span class="syntax-word">into</span> inventory</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">put</span> <span class="syntax-number">20</span> <span class="syntax-word">into</span> inventory <span class="syntax-word">named</span> quantity</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">remove</span> <span class="syntax-word">the</span> third <span class="syntax-word">of</span> inventory</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">for</span> <span class="syntax-word">each</span> item <span class="syntax-word">in</span> inventory:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">say</span> item</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">ok</span></span></code></pre>
+        <div class="example-output">
+          <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+          <pre tabindex="0"><code data-output>apple
+banana
+12
+4
+apple
+20
+5
+orange</code></pre>
+        </div>
+      </figure>
+          <p>A <code>for each</code> variable is temporary. If it shadows a variable, the previous value returns when the loop exits. The collection being traversed cannot be resized, even through another variable that refers to it. You can replace a named item, and a later iteration will see the new value.</p>
+        </section>
+
+        <section id="nested-collections" aria-labelledby="nested-heading">
+          <h2 id="nested-heading">Nested collections</h2>
+          <p>Wrap an inline nested literal in parentheses. In a multiline collection, a nested block can have its own <code>ok</code> followed by an optional name. Group a named lookup used as an item value, so Code can distinguish the lookup from a label on the new item.</p>
+          <figure class="example" data-program="nested_collections">
+        <figcaption class="code-heading">
+          <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/nested_collections.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>nested_collections.code</a>
+          <button type="button" class="copy" data-copy="source-nested_collections" aria-label="Copy nested_collections.code" hidden>Copy</button>
+        </figcaption>
+        <pre class="editor-source" tabindex="0"><code id="source-nested_collections" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-comment">note: A collection can contain other collections.</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">remember</span> pantry <span class="syntax-word">as</span> <span class="syntax-word">all</span> <span class="syntax-word">of</span> <span class="syntax-word">these</span>:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">all</span> <span class="syntax-word">of</span> <span class="syntax-word">these</span>:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>        <span class="syntax-text">&quot;rice&quot;</span>,</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>        <span class="syntax-text">&quot;oats&quot;</span> <span class="syntax-word">named</span> breakfast</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">ok</span> <span class="syntax-word">named</span> grains,</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    (<span class="syntax-word">all</span> <span class="syntax-word">of</span> <span class="syntax-word">these</span>: <span class="syntax-text">&quot;apple&quot;</span>, <span class="syntax-text">&quot;pear&quot;</span>) <span class="syntax-word">named</span> fruit,</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">true</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">ok</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">what</span> <span class="syntax-word">is</span> <span class="syntax-word">the</span> second <span class="syntax-word">of</span> pantry <span class="syntax-word">named</span> grains?</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">put</span> <span class="syntax-text">&quot;banana&quot;</span> <span class="syntax-word">into</span> (pantry <span class="syntax-word">named</span> fruit)</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">put</span> <span class="syntax-text">&quot;porridge&quot;</span> <span class="syntax-word">into</span> pantry <span class="syntax-word">named</span> grains <span class="syntax-word">named</span> breakfast</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">remove</span> <span class="syntax-word">position</span> <span class="syntax-number">1</span> <span class="syntax-word">of</span> pantry <span class="syntax-word">named</span> fruit</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">for</span> <span class="syntax-word">each</span> group <span class="syntax-word">in</span> pantry:</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span>    <span class="syntax-word">say</span> group</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">ok</span></span></code></pre>
+        <div class="example-output">
+          <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+          <pre tabindex="0"><code data-output>oats
+[&quot;rice&quot;, &quot;porridge&quot; named breakfast]
+[&quot;pear&quot;, &quot;banana&quot;]
+true</code></pre>
+        </div>
+      </figure>
+          <p>Named lookups can chain, as in <code>pantry named grains named breakfast</code>. In <code>the first of pantry named fruit</code>, the position is inside <code>fruit</code>. Use <code>(the first of pantry) named kind</code> to read a name inside the positional result.</p>
+          <p>A <code>put</code> target ending in an ungrouped <code>named</code> updates that entry. Group the lookup to append to the collection it returns. Assigning or inserting a collection shares it by reference. Printed circular references appear as <code>&lt;cycle&gt;</code>.</p>
+        </section>
+
+        <section id="advanced-features" aria-labelledby="advanced-heading">
+          <h2 id="advanced-heading">Advanced features</h2>
+          <h3 id="arrow-functions">Arrow functions</h3>
+          <p>Each call returns a string containing one emoji arrow. Use it anywhere Code accepts a value, such as <code>remember arrow(up) as direction</code> or <code>say arrow(up)</code>.</p>
+          <ul class="arrow-grid">
+            <li><code>arrow(up)</code><span class="arrow-glyph">⬆️</span></li>
+            <li><code>arrow(down)</code><span class="arrow-glyph">⬇️</span></li>
+            <li><code>arrow(left)</code><span class="arrow-glyph">⬅️</span></li>
+            <li><code>arrow(right)</code><span class="arrow-glyph">➡️</span></li>
+          </ul>
+          <figure class="example" data-program="arrows">
+            <figcaption class="code-heading">
+              <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/arrows.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>arrows.code</a>
+              <button type="button" class="copy" data-copy="source-arrows" aria-label="Copy arrows.code" hidden>Copy</button>
+            </figcaption>
+            <pre class="editor-source" tabindex="0"><code id="source-arrows" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-word">arrow</span>(up)</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-word">arrow</span>(down)</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-word">arrow</span>(left)</span>
+<span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-word">arrow</span>(right)</span></code></pre>
+            <div class="example-output">
+              <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+              <pre tabindex="0"><code data-output>⬆️
+⬇️
+⬅️
+➡️</code></pre>
+            </div>
+          </figure>
+        </section>
+
+        <section id="snake" aria-labelledby="snake-heading">
+          <h2 id="snake-heading">The snake rule</h2>
+          <p>A run of exactly seven consecutive <code>§</code> characters inside a quoted string becomes one <code>🐍</code>. String escapes count after decoding. Separate runs of seven each become a snake.</p>
+          <figure class="example" data-program="snake">
+        <figcaption class="code-heading">
+          <a class="code-tab" href="https://github.com/mcfr4g/code-lang/blob/main/examples/snake.code"><span class="tab-icon" aria-hidden="true">&lt;&gt;</span>snake.code</a>
+          <button type="button" class="copy" data-copy="source-snake" aria-label="Copy snake.code" hidden>Copy</button>
+        </figcaption>
+        <pre class="editor-source" tabindex="0"><code id="source-snake" data-source><span class="source-line"><span class="line-number" aria-hidden="true"></span><span class="syntax-word">say</span> <span class="syntax-text">&quot;§§§§§§§&quot;</span></span></code></pre>
+        <div class="example-output">
+          <span class="output-label"><span class="prompt" aria-hidden="true">&gt;_</span>Terminal output</span>
+          <pre tabindex="0"><code data-output>🐍</code></pre>
+        </div>
+      </figure>
+          <p>A shorter or longer run, or any <code>§</code> outside a string, stops the program before any instructions run. This includes comments. The message is <q>We must never speak of §!</q></p>
+        </section>
+
+        <section id="examples" aria-labelledby="examples-heading">
+          <h2 id="examples-heading">Examples</h2>
+          <p>Open any example in the <a href="#playground">browser playground</a>. To run it in Terminal, use <code>./bin/code-lang examples/turnips.code</code> from the project folder, substituting the filename below.</p>
+          <div class="table-scroll">
+            <table class="examples-table" aria-label="Included Code programs">
+              <thead><tr><th scope="col">Program</th><th scope="col">Try it for</th></tr></thead>
+              <tbody>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/hello.code">hello.code</a></td><td>Text and <code>say</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/comments.code">comments.code</a></td><td>Single-line and multiline comments</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/apples.code">apples.code</a></td><td>Variables and <code>but … more</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/counter.code">counter.code</a></td><td>Counting up in a repeat loop</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/countdown.code">countdown.code</a></td><td>Counting down with <code>take</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/nested_loops.code">nested_loops.code</a></td><td>A repeat loop inside another loop</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/inventory.code">inventory.code</a></td><td>Reading and changing a collection</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/shopping.code">shopping.code</a></td><td>Named items and <code>for each</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/nested_collections.code">nested_collections.code</a></td><td>Reading and changing nested items</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/turnips.code">turnips.code</a></td><td><code>if</code>, <code>otherwise</code>, and <code>while</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/arrows.code">arrows.code</a></td><td>All four arrow functions</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/one_line.code">one_line.code</a></td><td>Joining output with <code>say on one line</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/ask.code">ask.code</a></td><td>Read an answer and branch on it</td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/gob.code">gob.code</a></td><td>Start a continuous line of output by answering <code>Y</code></td></tr>
+                <tr><td><a href="https://github.com/mcfr4g/code-lang/blob/main/examples/snake.code">snake.code</a></td><td>Seven section signs and a snake</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="tests" aria-labelledby="tests-heading">
+          <h2 id="tests-heading">Tests and limits</h2>
+          <p>Run the shared tests against each interpreter, then run the Rust runtime tests. The shared test harness uses Python.</p>
+          <div class="command">
+            <div class="code-heading"><span class="code-tab"><span class="tab-icon" aria-hidden="true">&gt;_</span>Terminal</span><button type="button" class="copy" data-copy="run-tests" aria-label="Copy the test command" hidden>Copy</button></div>
+            <pre tabindex="0"><code id="run-tests">python3 -m unittest discover -s tests -v
+CODE_LANG_TEST_BINARY=./bin/code-lang python3 -m unittest discover -s tests -v
+cargo test --locked --manifest-path native/Cargo.toml</code></pre>
+          </div>
+          <p>Set <code>CODE_LANG_TEST_BINARY</code> to your own binary path if you built from source.</p>
+          <ul>
+            <li>Arithmetic is limited to update commands. Decimal calculations use Python's floating-point precision.</li>
+            <li>Comparisons are available in conditions. General expressions and user-defined functions are outside v0.2.</li>
+            <li>Text literals occupy a single source line. The interpreter checks the syntax of every code block, including branches that never run.</li>
+            <li>The native interpreter limits parser nesting and printed collection depth to 128 levels.</li>
+          </ul>
+        </section>
+        <section id="faqs" aria-labelledby="faqs-heading">
+          <h2 id="faqs-heading">FAQs</h2>
+          <dl class="faq-list">
+            <dt>Why can't I open files on my disk?</dt>
+            <dd>Sounds like a you problem.</dd>
+            <dt>Can you give me some practical use cases for the arrow functions?</dt>
+            <dd>No.</dd>
+            <dt>Why should I use this?</dt>
+            <dd>If you have to ask that question then you don't deserve to.</dd>
+            <dt>What does turnip complete mean?</dt>
+            <dd>The language can output the full turnip - not just "the tip" and some other stuff like it has conditions and flow or something and can run Gob Bluth's popular algorithm named Gob's program</dd>
+            <dt>Why did you make this?</dt>
+            <dd>Why does anyone do anything?</dd>
+          </dl>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <span>Code v0.2 documentation</span>
+      <a href="https://github.com/mcfr4g/code-lang">Source on GitHub</a>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <p class="sr-only" id="copy-status" role="status"></p>
+  <script>
+    const runtimeSwitch = document.getElementById("hero-runtime");
+    const heroCommand = document.getElementById("hero-command");
+    function updateHeroCommand() {
+      const runtime = runtimeSwitch.querySelector("input:checked");
+      heroCommand.textContent = runtime.value + " examples/apples.code";
+    }
+    runtimeSwitch.hidden = false;
+    runtimeSwitch.addEventListener("change", updateHeroCommand);
+    updateHeroCommand();
+
+    const sectionLinks = document.querySelectorAll(".contents a");
+    function updateSectionLinks() {
+      const currentSection = window.location.hash || "#playground";
+      for (const link of sectionLinks) {
+        if (link.hash === currentSection) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      }
+    }
+    window.addEventListener("hashchange", updateSectionLinks);
+    updateSectionLinks();
+
+    const copyStatus = document.getElementById("copy-status");
+    for (const button of document.querySelectorAll("[data-copy]")) {
+      const code = document.getElementById(button.dataset.copy);
+      let resetLabel;
+      button.hidden = false;
+      button.addEventListener("click", async () => {
+        clearTimeout(resetLabel);
+        try {
+          await navigator.clipboard.writeText(code.textContent.trimEnd());
+          button.textContent = "Copied";
+          copyStatus.textContent = "Copied to the clipboard.";
+        } catch {
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          button.textContent = "Press ⌘/Ctrl+C";
+          copyStatus.textContent = "Text selected. Press Command+C or Ctrl+C to copy.";
+        }
+        resetLabel = setTimeout(() => { button.textContent = "Copy"; }, 2800);
+      });
+    }
+  </script>
+  <script src="code-web-data.js"></script>
+  <script src="playground.js"></script>
+</body>
+</html>

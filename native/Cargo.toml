@@ -1,0 +1,23 @@
+[package]
+name = "code-lang"
+version = "0.2.0"
+edition = "2021"
+license = "WTFPL"
+description = 'Code- often stylised as "Code", a native script interpreter'
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+regex = "1"
+serde_json = "1"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[profile.browser]
+inherits = "release"
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

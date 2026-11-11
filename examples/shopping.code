@@ -1,0 +1,21 @@
+remember shopping as all of these:
+    "milk" named dairy,
+    "bread",
+    "eggs",
+    3 named quantity
+ok
+
+say "Shopping list:"
+
+for each item in shopping:
+    say item
+ok
+
+say "Total items:"
+how many are in shopping?
+
+put "butter" into shopping
+put 6 into shopping named quantity
+
+say "Updated quantity:"
+what is shopping named quantity?

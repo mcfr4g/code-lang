@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Code logo</title>
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="#15242c" stroke="#425b60" stroke-width="2"/>
+  <path d="M42 19H28c-8 0-14 6-14 13s6 13 14 13h6" fill="none" stroke="#8ff3c0" stroke-width="7" stroke-linecap="round"/>
+  <path d="M36 13h9a6 6 0 0 1 0 12h-9z" fill="#8ff3c0"/>
+  <circle cx="44" cy="17.5" r="1.9" fill="#15242c"/>
+  <path d="M44 45h6" fill="none" stroke="#c1b3ff" stroke-width="6" stroke-linecap="round"/>
+</svg>

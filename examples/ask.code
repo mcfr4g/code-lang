@@ -1,0 +1,7 @@
+ask "Continue? (Y/N)" and remember as answer
+
+if answer is "Y":
+    say "Continuing."
+otherwise:
+    say "Maybe next time."
+ok

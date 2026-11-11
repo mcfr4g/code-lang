@@ -1,0 +1,9 @@
+remember total as 0
+
+do this 3 times:
+    do this 4 times:
+        add one to total
+    ok
+ok
+
+what is total?

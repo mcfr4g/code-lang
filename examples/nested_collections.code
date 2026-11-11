@@ -1,0 +1,18 @@
+note: A collection can contain other collections.
+remember pantry as all of these:
+    all of these:
+        "rice",
+        "oats" named breakfast
+    ok named grains,
+    (all of these: "apple", "pear") named fruit,
+    true
+ok
+
+what is the second of pantry named grains?
+put "banana" into (pantry named fruit)
+put "porridge" into pantry named grains named breakfast
+remove position 1 of pantry named fruit
+
+for each group in pantry:
+    say group
+ok

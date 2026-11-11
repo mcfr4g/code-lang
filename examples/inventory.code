@@ -1,0 +1,19 @@
+remember inventory as all of these:
+    "apple" named fruit,
+    12 named quantity,
+    "banana",
+    5
+ok
+
+what is the first of inventory?
+what is the third of inventory?
+what is inventory named quantity?
+how many are in inventory?
+
+put "orange" into inventory
+put 20 into inventory named quantity
+remove the third of inventory
+
+for each item in inventory:
+    say item
+ok

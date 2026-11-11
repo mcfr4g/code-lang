@@ -1,0 +1,7 @@
+ask "Gob's Program: Y/N?" and remember as answer
+
+if answer is "Y":
+  while true:
+    say on one line "Penus "
+  ok
+ok

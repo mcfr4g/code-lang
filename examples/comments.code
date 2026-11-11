@@ -1,0 +1,7 @@
+comment:
+    This is a multiline comment.
+    say "This line is ignored."
+end of comment
+
+comment on one line: Only the next line produces output.
+say "Hello from Code!"

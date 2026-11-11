@@ -1,0 +1,12 @@
+remember 3 as turnips
+
+while turnips is greater than 0:
+    if turnips is equal to 1:
+        say "Last turnip!"
+    otherwise:
+        how many turnips?
+    ok
+    turnips but 1 less
+ok
+
+say "Turnip complete."
